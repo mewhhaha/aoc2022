@@ -19,6 +19,7 @@ pub fn main() !void {
             current += n;
         }
     }
+    if (current > max) max = current;
 
     log.info("{d}", .{max});
 }

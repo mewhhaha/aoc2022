@@ -22,6 +22,7 @@ pub fn main() !void {
             current += n;
         }
     }
+    if (current > top[0]) top[0] = current;
 
     log.info("{d}", .{sum(u32, &top)});
 }
