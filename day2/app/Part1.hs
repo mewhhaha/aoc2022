@@ -21,8 +21,6 @@ outcome (Round {opponent, self})
   | self `winsAgainst` opponent = Win
   | otherwise = Draw
 
--- >>> score <$> [Round Rock Paper, Round Paper Rock, Round Scissors Scissors]
--- [8,1,6]
 score :: Round -> Int
 score r@Round {self} = scoreRound (outcome r) + scoreHand self
 
