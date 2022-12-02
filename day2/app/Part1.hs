@@ -35,7 +35,7 @@ scoreHand Paper = 2
 scoreHand Scissors = 3
 
 parseRound :: [Char] -> Round
-parseRound [op, _, me] = uncurry Round $ both parseHand (op, me)
+parseRound [op, _, me] = Round (parseHand op) (parseHand me)
 parseRound _ = undefined
 
 parseHand :: Char -> Hand
@@ -46,9 +46,6 @@ parseHand 'Y' = Paper
 parseHand 'Z' = Scissors
 parseHand 'C' = Scissors
 parseHand _ = undefined
-
-both :: (t -> b) -> (t, t) -> (b, b)
-both f (a, b) = (f a, f b)
 
 winsAgainst :: (Eq a, Bounded a, Enum a) => a -> a -> Bool
 winsAgainst a b = a == next b
