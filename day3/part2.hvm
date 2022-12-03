@@ -1,0 +1,100 @@
+// --- Basic functions ---
+
+(Inc n) = (+ n 1)
+(Dec n) = (- n 1)
+
+(If 1 a b) = a
+(If 0 a b) = b
+
+(IsLowerCase n) = (If (>= n 'a') 1 0)
+
+(Fst (Pair a b)) = a
+(Snd (Pair a b)) = b
+
+// --- String functions ---
+
+// 10 is the ASCII code for '\n'
+(Lines0 String.nil ys) = (Cons ys Nil)
+(Lines0 (String.cons 10 xs) ys) = (Cons ys (Lines0 xs String.nil))
+(Lines0 (String.cons x xs) ys) = (Lines0 xs (String.cons x ys))
+(Lines xs) = (Lines0 xs String.nil)
+
+// --- Array functions ---
+
+(Reverse0 Nil ys) = ys
+(Reverse0 (Cons x xs) ys) = (Reverse0 xs (Cons x ys))
+(Reverse xs) = (Reverse0 xs Nil)
+
+(SplitAt0 0 xs ys) = (Pair (Reverse ys) xs)
+(SplitAt0 n Nil ys) = (Pair (Reverse ys) Nil)
+(SplitAt0 n (Cons x xs) ys) = (SplitAt0 (Dec n) xs (Cons x ys))
+(SplitAt n xs) = (SplitAt0 n xs Nil)
+
+(Chunk n Nil) = Nil
+(Chunk n xs) =
+  let r = (SplitAt n xs)
+  (Cons (Fst r) (Chunk n (Snd r)))
+
+(Map f Nil) = Nil
+(Map f (Cons x xs)) = (Cons (f x) (Map f xs))
+
+// --- Maybe functions ---
+
+(CatMaybes Nil) = Nil
+(CatMaybes (Cons Nothing xs)) = (CatMaybes xs)
+(CatMaybes (Cons (Just x) xs)) = (Cons x (CatMaybes xs))
+
+// --- Set functions ---
+
+(Insert x Leaf) = (Node x Leaf Leaf)
+(Insert x (Node a l r)) = 
+  let insertLeft = (Node a (Insert x l) r)
+  let insertRight = (Node a l (Insert x r))
+  (If (== x a) (Node a l r) (If (< x a) insertLeft insertRight))
+
+(Set0 String.nil m) = m
+(Set0 (String.cons x xs) m) = (Set0 xs (Insert x m))
+(Set xs) = (Set0 xs Leaf)
+
+(Merge Leaf Leaf) = Leaf
+(Merge Leaf b) = b
+(Merge (Node a l r) b) = 
+  let m = (Merge l r)
+  (Insert a (Merge m b))
+
+(Intersection Leaf b) = Leaf
+(Intersection a Leaf) = Leaf
+(Intersection (Node a al ar) (Node b bl br)) = 
+  let eq = (Merge (Intersection al bl) (Intersection ar br))
+  let descendLeft = (Merge (Merge (Intersection (Node a al ar) bl) (Intersection al br)) (Intersection ar (Node b Leaf br)))
+  let descendRight = (Merge (Merge (Intersection (Node b bl br) al) (Intersection bl ar)) (Intersection br (Node a Leaf ar)))
+  let neq = (If (< a b) descendLeft descendRight)
+  (If (== a b) (Insert a eq) neq)
+
+
+(Top Leaf) = Nothing
+(Top (Node a l r)) = (Just a)
+
+// --- Solve Functions ---
+
+(IntersectionAll Nil) = Leaf
+(IntersectionAll (Cons x Nil)) = (Set x)
+(IntersectionAll (Cons x xs)) = (Intersection (Set x) (IntersectionAll xs))
+
+(Score n) =  (Inc (If (IsLowerCase n) (- n 'a') (+ (- n 'A') 26)))
+
+(Sum Nil) = 0
+(Sum (Cons x xs)) = (+ x (Sum xs))
+
+(Solve input c) = 
+  (HVM.log
+    (Sum
+      (Map (@n (Score n))
+        (CatMaybes 
+          (Map 
+            (@chunks (Top (IntersectionAll chunks))) 
+              (Chunk 3 (Lines input)))))) c)
+
+Main =
+  (HVM.load "input.txt" @input 
+    (Solve input (Done)))
