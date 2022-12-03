@@ -56,12 +56,14 @@
 (Merge Leaf b) = b
 (Merge (Node a l r) b) = (Merge l (Merge r (Insert a b)))
 
+(Descend (Node a al ar) (Node b bl br)) =  (Merge (Merge (Intersection (Node a al ar) bl) (Intersection al br)) (Intersection ar (Node b Leaf br)))
+
 (Intersection Leaf b) = Leaf
 (Intersection a Leaf) = Leaf
 (Intersection (Node a al ar) (Node b bl br)) = 
   let eq = (Merge (Intersection al bl) (Intersection ar br))
-  let descendLeft = (Merge (Merge (Intersection (Node a al ar) bl) (Intersection al br)) (Intersection ar (Node b Leaf br)))
-  let descendRight = (Merge (Merge (Intersection (Node b bl br) al) (Intersection bl ar)) (Intersection br (Node a Leaf ar)))
+  let descendLeft = (Descend (Node a al ar) (Node b bl br))
+  let descendRight = (Descend (Node b bl br) (Node a al ar))
   let neq = (If (< a b) descendLeft descendRight)
   (If (== a b) (Insert a eq) neq)
 
