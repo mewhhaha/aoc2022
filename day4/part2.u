@@ -3,27 +3,16 @@ part2 = do
   size = FilePath.getSize path
   fileHandle = open path Read
   t = fromUtf8 (Handle.getBytes fileHandle size)
-  provide t solve
+  solve t
 
-solve = do
-  lines ask
-    |> List.map parseSections
-    |> List.count (uncurry hasAnyOverlap)
+solve = 
+  lines 
+    >> List.map parseSections
+    >> List.count (uncurry hasAnyOverlap)
     
-lines = Text.split ?\n
-
-parseSections = Text.split ?, >> pairBimap (parseSection)
-
-parseSection = Text.split ?- >> pairBimap (Nat.fromText >> getOrBug "panic") >> uncurry Section.fromRange
-
 hasAnyOverlap a b = Section.neq (Section.and a b) Section.zero
-
-pair x = match x with
-  [a, b] -> (a, b)
-  _ -> bug "panic"
-
-pairBimap f = pair >> bimap f
  
+-- TESTING EXPRESSION
 testInput = 
   "2-4,6-8
 2-3,4-5 
@@ -32,10 +21,22 @@ testInput =
 6-6,4-6
 2-6,4-8"
 
-test = provide testInput solve
+test = solve testInput 
 >test
 
--- I just wanted an unsigned 128 bit number sadface
+-- JUST PARSING INTO SECTIONS HELPERS
+lines = Text.split ?\n
+
+pair x = match x with
+  [a, b] -> (a, b)
+  _ -> bug "panic"
+
+pairBimap f = pair >> bimap f
+
+parseSections = Text.split ?, >> pairBimap (parseSection)
+parseSection = Text.split ?- >> pairBimap (Nat.fromText >> getOrBug "panic") >> uncurry Section.fromRange
+
+-- A SECTION IS JUST A HOMEMADE NAT128
 Section.fromRange a b = 
   f x = Section.set (a - 1) x
   if (a == b) then f (Section.zero) else f (Section.fromRange (a + 1) b) 
@@ -57,12 +58,6 @@ Section.eq a b =
 
 Section.neq a b = Section.eq a b == false
 
-Section.popCount a = 
-  (Section a1 a2) = a
-  Nat.popCount a1 + Nat.popCount a2
-
 Section.zero = Section 0 0
-
-
 
 structural type Section = Section Nat Nat
