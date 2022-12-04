@@ -12,3 +12,5 @@ It's fine. What's annoying is that I was using Windows and couldn't for the life
 - `try` syntax when looping is quite nice.
 - I don't like memory management. I started setting up these data structures with allocators, but then just switched to using the stack exclusively.
 - The VSCode plugin kept breaking on me and I wasn't getting much feedback.
+
+All in all, I'll probably go back to making somethign in zig again.

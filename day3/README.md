@@ -1,7 +1,9 @@
 You need [HVM](https://github.com/Kindelia/HVM) installed to run this
 
-cat input.txt | hvm run -f part1.hvm
-cat input.txt | hvm run -f part2.hvm
+```bash
+$ cat input.txt | hvm run -f part1.hvm
+$ cat input.txt | hvm run -f part2.hvm
+```
 
 POST MORTEM:
 I regret everything. Never doing this again.

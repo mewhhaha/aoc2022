@@ -1,0 +1,63 @@
+part1 = do
+  path = FilePath "./input.txt"
+  size = FilePath.getSize path
+  fileHandle = open path Read
+  t = fromUtf8 (Handle.getBytes fileHandle size)
+  provide t solve
+
+solve = do
+  lines ask
+    |> List.map parseSections
+    |> List.count (uncurry hasFullOverlap)
+     
+lines = Text.split ?\n
+
+parseSections = Text.split ?, >> pairBimap (parseSection >> uncurry Section.fromRange)
+
+parseSection = Text.split ?- >> pairBimap (getOrBug "panic" << Nat.fromText)
+
+hasFullOverlap a b = 
+  c = Section.and a b
+  (Section.eq a c) || (Section.eq b c)
+
+pair x = match x with
+  [a, b] -> (a, b)
+  _ -> bug "panic"
+
+pairBimap f = pair >> bimap f
+
+testInput = 
+  "2-4,6-8
+2-3,4-5
+5-7,7-9
+2-8,3-7
+6-6,4-6
+2-6,4-8"
+
+test = provide testInput solve
+
+-- I just wanted an unsigned 128 bit number sadface
+Section.fromRange a b = 
+  f x = Section.set (a - 1) x
+  if (a == b) then f (Section.zero) else f (Section.fromRange (a + 1) b) 
+
+Section.set n s = 
+  (Section a b) = s
+  setBit x i = (Nat.or x (Nat.pow 2 i))
+  if n > 63 then Section a (setBit b (n - 64)) else Section (setBit a n) b
+
+Section.and a b = 
+  (Section a1 a2) = a
+  (Section b1 b2) = b
+  Section (Nat.and a1 b1) (Nat.and a2 b2)
+
+Section.eq a b = 
+  (Section a1 a2) = a
+  (Section b1 b2) = b
+  (a1 == b1) && (a2 == b2)
+
+Section.zero = Section 0 0
+
+structural type Section = Section Nat Nat
+
+
