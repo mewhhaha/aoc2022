@@ -4,6 +4,7 @@ const fmt = std.fmt;
 const log = std.log;
 const io = std.io;
 const mem = std.mem;
+const math = std.math;
 
 pub fn main() !void {
     const stdin = io.getStdIn().reader();
@@ -15,14 +16,13 @@ pub fn main() !void {
     while (try stdin.readUntilDelimiterOrEof(&buffer, '\n')) |line| {
         if (line.len == 0) {
             sort.sort(u32, &top, {}, sort.asc(u32));
-            if (current > top[0]) top[0] = current;
+            top[0] = math.max(current, top[0]);
             current = 0;
         } else {
-            var n: u32 = try fmt.parseUnsigned(u32, line, 10);
-            current += n;
+            current += try fmt.parseUnsigned(u32, line, 10);
         }
     }
-    if (current > top[0]) top[0] = current;
+    top[0] = math.max(current, top[0]);
 
     log.info("{d}", .{sum(u32, &top)});
 }
