@@ -1,4 +1,4 @@
-use std::io;
+use std::{convert::identity, io};
 
 fn main() {
     let stdin = io::stdin();
@@ -14,47 +14,42 @@ fn main() {
 
     let columns = transpose(&rows);
 
-    let mut result = 0;
-
-    let max_row = rows.len() - 1;
-    let max_col = rows[0].len() - 1;
-    let is_edge = |x, y| y == 0 || x == 0 || y == max_row || x == max_col;
-
-    for (y, row) in rows.iter().enumerate() {
-        for (x, _) in row.iter().enumerate() {
-            if is_edge(x, y) {
-                continue;
-            }
-
+    let result = (0..rows.len())
+        .flat_map(|y| (0..rows[0].len()).map(move |x| (x, y)))
+        .map(|(x, y)| {
             let row_score = calc_scenic_rows(x, y, &rows);
             let col_score = calc_scenic_rows(y, x, &columns);
 
-            result = result.max(row_score * col_score);
-        }
-    }
+            row_score * col_score
+        })
+        .max_by_key(|x| x.clone())
+        .unwrap_or(0);
 
     println!("{:?}", result);
 }
 
 fn calc_scenic_rows(x: usize, y: usize, rows: &Vec<Vec<i32>>) -> i32 {
-    let (left, rest) = rows[y].split_at(x);
-    let (first, right) = rest.split_first().unwrap();
-    let l = calc_scenic_row(&first, left.iter().rev());
-    let r = calc_scenic_row(&first, right.iter());
+    let row = &rows[y];
+    let tree_house = &row[x];
+    let left = row.iter().take(x).rev();
+    let right = row.iter().skip(x + 1);
 
-    return l * r;
+    let l = calc_scenic_row(&tree_house, left);
+    let r = calc_scenic_row(&tree_house, right);
+
+    l * r
 }
 
-fn calc_scenic_row<'a>(height: &i32, row: impl Iterator<Item = &'a i32>) -> i32 {
-    let mut cancel = false; // cancel flag to include the element that stopped visibility
-    row.take_while(|x| {
-        if cancel {
-            return false;
+fn calc_scenic_row<'a>(height: &i32, mut row: impl Iterator<Item = &'a i32>) -> i32 {
+    row.try_fold(0, |count, x| {
+        let next = count + 1;
+        if x < height {
+            Ok(next)
+        } else {
+            Err(next)
         }
-        cancel = *x >= height;
-        return true;
     })
-    .count() as i32
+    .unwrap_or_else(identity)
 }
 
 fn transpose<T: Clone>(grid: &Vec<Vec<T>>) -> Vec<Vec<T>> {

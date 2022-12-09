@@ -1,3 +1,5 @@
+#![feature(bool_to_option)]
+
 use std::{collections::HashSet, io};
 
 fn main() {
@@ -14,48 +16,34 @@ fn main() {
 
     let mut memo = HashSet::new();
 
-    memo.extend(check_rows(&rows).into_iter());
-    memo.extend(
-        check_rows(&transpose(&rows))
-            .into_iter()
-            .map(|(x, y)| (y, x)),
-    );
+    memo.extend(check_rows(&rows));
+    memo.extend(check_rows(&transpose(&rows)).map(flip));
 
     println!("{:?}", memo.len());
 }
 
-fn check_rows(grid: &Vec<Vec<i32>>) -> Vec<(usize, usize)> {
-    let mut coords = Vec::new();
-    for (y, row) in grid.iter().enumerate() {
-        for coord in check_row(y, row.iter()) {
-            coords.push(coord);
-        }
-
-        let l = row.len() - 1;
-        for (x, y) in check_row(y, row.iter().rev()) {
-            coords.push((l - x, y));
-        }
-    }
-
-    return coords;
+fn flip<A, B>((a, b): (A, B)) -> (B, A) {
+    (b, a)
 }
 
-fn check_row<'a>(
-    y: usize,
-    row: impl Iterator<Item = &'a i32>,
-) -> impl Iterator<Item = (usize, usize)> {
-    row.scan(-1, is_visible)
-        .enumerate()
-        .filter_map(move |(x, visible)| if visible { Some((x, y)) } else { None })
-}
+fn check_rows(grid: &Vec<Vec<i32>>) -> impl Iterator<Item = (usize, usize)> + '_ {
+    grid.iter().enumerate().flat_map(|(y, row)| {
+        let check_row = |mut highest| {
+            move |x| {
+                if row[x] > highest {
+                    highest = row[x];
+                    Some((x, y))
+                } else {
+                    None
+                }
+            }
+        };
 
-fn is_visible(highest: &mut i32, i: &i32) -> Option<bool> {
-    if i > highest {
-        *highest = *i;
-        return Some(true);
-    }
+        let left = (0..row.len()).filter_map(check_row(-1));
+        let right = (0..row.len()).rev().filter_map(check_row(-1));
 
-    return Some(false);
+        left.chain(right)
+    })
 }
 
 fn transpose<T: Clone>(grid: &Vec<Vec<T>>) -> Vec<Vec<T>> {
