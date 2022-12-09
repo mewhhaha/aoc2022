@@ -18,11 +18,11 @@ fn main() {
 
     let max_row = rows.len() - 1;
     let max_col = rows[0].len() - 1;
+    let is_edge = |x, y| y == 0 || x == 0 || y == max_row || x == max_col;
 
     for (y, row) in rows.iter().enumerate() {
         for (x, _) in row.iter().enumerate() {
-            let is_edge = y == 0 || x == 0 || y == max_row || x == max_col;
-            if is_edge {
+            if is_edge(x, y) {
                 continue;
             }
 
