@@ -24,8 +24,8 @@ fn main() {
         .last();
 
     if let Some(size) = answer {
-        let offset_zero_index = 1;
-        let offset_stop_index = 1;
+        let offset_zero_index = 1; // +1 for the zero index
+        let offset_stop_index = 1; // +1 since we return None when we find a match, therefore missing out on a character
         println!("{:?}", size + offset_zero_index + offset_stop_index);
     }
 }
