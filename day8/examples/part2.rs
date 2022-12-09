@@ -39,23 +39,22 @@ fn main() {
 fn calc_scenic_rows(x: usize, y: usize, rows: &Vec<Vec<i32>>) -> i32 {
     let (left, rest) = rows[y].split_at(x);
     let (first, right) = rest.split_first().unwrap();
-    let l = calc_row(&first, left.len(), left.iter().rev());
-    let r = calc_row(&first, right.len(), right.iter());
+    let l = calc_scenic_row(&first, left.iter().rev());
+    let r = calc_scenic_row(&first, right.iter());
 
     return l * r;
 }
 
-fn calc_row<'a, I>(height: &i32, edge: usize, row: I) -> i32
-where
-    I: Iterator<Item = &'a i32>,
-{
-    let score = row.take_while(|x| *x < height).count() as i32;
-    let over_edge = score == edge as i32;
-    if over_edge {
-        score
-    } else {
-        score + 1
-    }
+fn calc_scenic_row<'a>(height: &i32, row: impl Iterator<Item = &'a i32>) -> i32 {
+    let mut cancel = false; // cancel flag to include the element that stopped visibility
+    row.take_while(|x| {
+        if cancel {
+            return false;
+        }
+        cancel = *x >= height;
+        return true;
+    })
+    .count() as i32
 }
 
 fn transpose<T: Clone>(grid: &Vec<Vec<T>>) -> Vec<Vec<T>> {

@@ -40,14 +40,13 @@ fn check_rows(grid: &Vec<Vec<i32>>) -> Vec<(usize, usize)> {
     return coords;
 }
 
-fn check_row<'a, I>(y: usize, row: I) -> Vec<(usize, usize)>
-where
-    I: Iterator<Item = &'a i32>,
-{
+fn check_row<'a>(
+    y: usize,
+    row: impl Iterator<Item = &'a i32>,
+) -> impl Iterator<Item = (usize, usize)> {
     row.scan(-1, is_visible)
         .enumerate()
-        .filter_map(|(x, visible)| if visible { Some((x, y)) } else { None })
-        .collect::<Vec<_>>()
+        .filter_map(move |(x, visible)| if visible { Some((x, y)) } else { None })
 }
 
 fn is_visible(highest: &mut i32, i: &i32) -> Option<bool> {
