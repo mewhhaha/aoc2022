@@ -7,26 +7,16 @@ const FULL: usize = 14;
 
 fn main() {
     let stdin = io::stdin();
-    let answer = stdin
-        .lock()
-        .bytes()
-        .flatten()
-        .enumerate()
-        .scan(VecDeque::new(), |acc, (i, c)| {
-            push_queue(acc, c);
+    let mut acc = VecDeque::new();
 
-            if is_marker(acc) {
-                None
-            } else {
-                Some(i)
-            }
-        })
-        .last();
+    let answer = stdin.lock().bytes().position(|c| {
+        push_queue(&mut acc, c.unwrap());
+        is_marker(&acc)
+    });
 
     if let Some(size) = answer {
         let offset_zero_index = 1; // +1 for the zero index
-        let offset_stop_index = 1; // +1 since we return None when we find a match, therefore missing out on a character
-        println!("{:?}", size + offset_zero_index + offset_stop_index);
+        println!("{:?}", size + offset_zero_index);
     }
 }
 
