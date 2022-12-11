@@ -12,14 +12,14 @@ enum Instruction {
 
 fn main() {
     let stdin = io::stdin();
-    let instructions =
-        stdin
-            .lines()
-            .flatten()
-            .flat_map(|x| match x.parse::<Instruction>().unwrap() {
-                Instruction::Noop => vec![Instruction::Noop],
-                Instruction::AddX(v) => vec![Instruction::Noop, Instruction::AddX(v)],
-            });
+    let instructions = stdin
+        .lines()
+        .flatten()
+        .map(|x| x.parse::<Instruction>().unwrap())
+        .flat_map(|instruction| match instruction {
+            Instruction::Noop => vec![Instruction::Noop],
+            Instruction::AddX(v) => vec![Instruction::Noop, Instruction::AddX(v)],
+        });
 
     let print_cycle = 40;
     let mut current_cycle = 0;
@@ -27,8 +27,10 @@ fn main() {
     let mut sprite_position = 1;
 
     for instruction in instructions {
-        let diff = current_cycle - sprite_position;
-        let c = if diff >= -1 && diff <= 1 { '#' } else { '.' };
+        let c = match current_cycle - sprite_position {
+            diff if diff >= -1 && diff <= 1 => '#',
+            _ => '.',
+        };
         row.push(c);
 
         current_cycle += 1;
