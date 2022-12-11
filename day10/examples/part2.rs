@@ -21,23 +21,20 @@ fn main() {
             Instruction::AddX(v) => vec![Instruction::Noop, Instruction::AddX(v)],
         });
 
-    let print_cycle = 40;
-    let mut current_cycle = 0;
+    let print_cycle = 39;
     let mut row = "".to_string();
     let mut sprite_position = 1;
 
-    for instruction in instructions {
-        let c = match current_cycle - sprite_position {
+    for (current_cycle, instruction) in instructions.enumerate() {
+        let row_position = current_cycle as i32 % (print_cycle + 1);
+        let c = match row_position - sprite_position {
             diff if diff >= -1 && diff <= 1 => '#',
             _ => '.',
         };
         row.push(c);
 
-        current_cycle += 1;
-
-        if current_cycle == print_cycle {
+        if row_position == print_cycle {
             println!("{:?}", row);
-            current_cycle = 0;
             row = "".to_string();
         }
 
