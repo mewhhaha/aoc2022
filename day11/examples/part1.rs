@@ -115,7 +115,8 @@ fn main() {
     }
 
     inspections.sort();
-    let result: u32 = inspections.into_iter().rev().take(2).product();
+    inspections.reverse();
+    let result: u32 = inspections[0] * inspections[1];
     println!("{:?}", result);
 }
 

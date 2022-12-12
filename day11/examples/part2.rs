@@ -1,6 +1,10 @@
+#![feature(array_zip)]
+
 use parse_display::{Display, FromStr};
 use std::io::{self, Read, Stdin};
 use std::num::ParseIntError;
+
+const N_MONKEYS: usize = 8;
 
 #[derive(Display, FromStr, PartialEq, Debug, Clone)]
 #[display(
@@ -21,7 +25,7 @@ struct Monkey {
 }
 
 #[derive(PartialEq, Debug, Clone)]
-struct Items(Vec<Vec<u64>>);
+struct Items(Vec<[u64; N_MONKEYS]>);
 
 impl std::str::FromStr for Items {
     type Err = ParseIntError;
@@ -29,7 +33,7 @@ impl std::str::FromStr for Items {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let words = s
             .split(", ")
-            .map(|x| vec![x.parse::<u64>().unwrap(); 8])
+            .map(|x| [x.parse::<u64>().unwrap(); N_MONKEYS])
             .collect::<Vec<_>>();
 
         Ok(Items(words))
@@ -68,59 +72,55 @@ enum Symbol {
 
 fn main() {
     let stdin = io::stdin();
-    let mut monkeys = read_as_string(stdin)
+    let mut monkeys: [Monkey; N_MONKEYS] = read_as_string(stdin)
         .split("\n\n")
         .map(|x| x.parse::<Monkey>().unwrap())
-        .collect::<Vec<_>>();
+        .collect::<Vec<_>>()
+        .try_into()
+        .unwrap();
 
-    let mut inspections = vec![0 as u64; monkeys.len()];
+    let mut inspections = [0 as u64; N_MONKEYS];
 
-    let divisors = monkeys.iter().map(|m| m.test).collect::<Vec<_>>();
+    let divisors = monkeys.clone().map(|m| m.test);
 
-    let limit = |vs: &Vec<u64>| {
-        vs.iter()
-            .zip(divisors.iter())
-            .map(|(v, div)| v % div)
-            .collect::<Vec<_>>()
-    };
-
-    monkeys.iter_mut().for_each(|x| {
-        x.items.0 = x.items.0.iter().map(limit).collect::<Vec<_>>();
-    });
+    let mod_divisors = |vs: &[u64; N_MONKEYS]| vs.zip(divisors).map(|(v, div)| v % div);
 
     let rounds = 0..10000;
 
     for _ in rounds {
-        for i in 0..monkeys.len() {
-            let Monkey {
-                n,
-                items,
-                op,
-                test: _,
-                if_true,
-                if_false,
-            } = monkeys[i].clone();
+        for n in 0..N_MONKEYS {
+            let op = &monkeys[n].op;
+            let if_true = monkeys[n].if_true;
+            let if_false = monkeys[n].if_false;
 
-            inspections[n] += items.0.len() as u64;
+            inspections[n] += monkeys[n].items.0.len() as u64;
 
-            for item in items.0.into_iter() {
-                let worry_level = limit(&item.iter().map(|x| eval(*x, &op)).collect::<Vec<_>>());
+            let throws = monkeys[n]
+                .items
+                .0
+                .drain(..)
+                .map(|item| {
+                    let worry_level = mod_divisors(&item.map(|x| eval(x, op)));
 
-                let to = if worry_level[i] == 0 {
-                    if_true
-                } else {
-                    if_false
-                };
+                    let to = if worry_level[n] == 0 {
+                        if_true
+                    } else {
+                        if_false
+                    };
 
+                    (to, worry_level)
+                })
+                .collect::<Vec<_>>();
+
+            for (to, worry_level) in throws {
                 monkeys[to].items.0.push(worry_level);
             }
-
-            monkeys[i].items.0.clear();
         }
     }
 
     inspections.sort();
-    let result: u64 = inspections.into_iter().rev().take(2).product();
+    inspections.reverse();
+    let result: u64 = inspections[0] * inspections[1];
     println!("{:?}", result);
 }
 
