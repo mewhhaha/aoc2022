@@ -1,0 +1,16 @@
+[package]
+edition = "2021"
+name = "day11"
+version = "0.1.0"
+
+[[example]]
+name = "part1"
+
+[[example]]
+name = "part2"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+gcd = "2.2.0"
+parse-display = "0.7.0"
