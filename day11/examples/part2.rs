@@ -89,11 +89,11 @@ fn main() {
 
     for _ in rounds {
         for n in 0..N_MONKEYS {
+            inspections[n] += monkeys[n].items.0.len() as u64;
+
             let op = &monkeys[n].op;
             let if_true = monkeys[n].if_true;
             let if_false = monkeys[n].if_false;
-
-            inspections[n] += monkeys[n].items.0.len() as u64;
 
             let throws = monkeys[n]
                 .items
