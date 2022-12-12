@@ -114,8 +114,7 @@ fn main() {
         }
     }
 
-    inspections.sort();
-    inspections.reverse();
+    inspections.sort_by(|a, b| b.cmp(a));
     let result: u32 = inspections[0] * inspections[1];
     println!("{:?}", result);
 }

@@ -25,7 +25,7 @@ struct Monkey {
 }
 
 #[derive(PartialEq, Debug, Clone)]
-struct Items(Vec<[u64; N_MONKEYS]>);
+struct Items(Vec<u64>);
 
 impl std::str::FromStr for Items {
     type Err = ParseIntError;
@@ -33,7 +33,7 @@ impl std::str::FromStr for Items {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let words = s
             .split(", ")
-            .map(|x| [x.parse::<u64>().unwrap(); N_MONKEYS])
+            .map(|x| x.parse::<u64>().unwrap())
             .collect::<Vec<_>>();
 
         Ok(Items(words))
@@ -72,40 +72,39 @@ enum Symbol {
 
 fn main() {
     let stdin = io::stdin();
-    let mut monkeys: [Monkey; N_MONKEYS] = read_as_string(stdin)
+    let mut monkeys = read_as_string(stdin)
         .split("\n\n")
         .map(|x| x.parse::<Monkey>().unwrap())
-        .collect::<Vec<_>>()
-        .try_into()
-        .unwrap();
+        .collect::<Vec<_>>();
 
     let mut inspections = [0 as u64; N_MONKEYS];
 
-    let divisors = monkeys.clone().map(|m| m.test);
-
-    let mod_divisors = |vs: &[u64; N_MONKEYS]| vs.zip(divisors).map(|(v, div)| v % div);
+    let lcm = monkeys.iter().map(|m| m.test).product::<u64>();
 
     let rounds = 0..10000;
 
     for _ in rounds {
         for n in 0..N_MONKEYS {
-            inspections[n] += monkeys[n].items.0.len() as u64;
+            let Monkey {
+                n: _,
+                items: Items(items),
+                test,
+                op,
+                if_true,
+                if_false,
+            } = &mut monkeys[n];
 
-            let op = &monkeys[n].op;
-            let if_true = monkeys[n].if_true;
-            let if_false = monkeys[n].if_false;
+            inspections[n] += items.len() as u64;
 
-            let throws = monkeys[n]
-                .items
-                .0
+            let throws = items
                 .drain(..)
                 .map(|item| {
-                    let worry_level = mod_divisors(&item.map(|x| eval(x, op)));
+                    let worry_level = eval(item, &op) % lcm;
 
-                    let to = if worry_level[n] == 0 {
-                        if_true
+                    let to = if worry_level % *test == 0 {
+                        if_true.clone()
                     } else {
-                        if_false
+                        if_false.clone()
                     };
 
                     (to, worry_level)
@@ -118,8 +117,7 @@ fn main() {
         }
     }
 
-    inspections.sort();
-    inspections.reverse();
+    inspections.sort_by(|a, b| b.cmp(a));
     let result: u64 = inspections[0] * inspections[1];
     println!("{:?}", result);
 }
