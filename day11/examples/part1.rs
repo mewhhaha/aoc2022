@@ -86,29 +86,34 @@ fn main() {
     for _ in 0..20 {
         for i in 0..monkeys.len() {
             let Monkey {
-                n,
-                items,
+                n: _,
+                items: Items(items),
                 op,
                 test,
                 if_true,
                 if_false,
-            } = monkeys[i].clone();
+            } = &mut monkeys[i];
 
-            inspections[n] += items.0.len() as u32;
+            inspections[i] += items.len() as u32;
 
-            for item in items.0.into_iter() {
-                let worry_level = eval(item, &op) / 3;
+            let throws = items
+                .drain(..)
+                .map(|item| {
+                    let worry_level = eval(item, &op) / 3;
 
-                let to = if worry_level % test == 0 {
-                    if_true
-                } else {
-                    if_false
-                };
+                    let to = if worry_level % *test == 0 {
+                        if_true.clone()
+                    } else {
+                        if_false.clone()
+                    };
 
+                    (to, worry_level)
+                })
+                .collect::<Vec<_>>();
+
+            for (to, worry_level) in throws {
                 monkeys[to].items.0.push(worry_level);
             }
-
-            monkeys[i].items.0.clear();
         }
     }
 
