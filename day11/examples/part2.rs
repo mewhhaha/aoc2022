@@ -4,8 +4,6 @@ use parse_display::{Display, FromStr};
 use std::io::{self, Read, Stdin};
 use std::num::ParseIntError;
 
-const N_MONKEYS: usize = 8;
-
 #[derive(Display, FromStr, PartialEq, Debug, Clone)]
 #[display(
     "Monkey {n}:
@@ -77,14 +75,14 @@ fn main() {
         .map(|x| x.parse::<Monkey>().unwrap())
         .collect::<Vec<_>>();
 
-    let mut inspections = [0 as u64; N_MONKEYS];
+    let mut inspections = vec![0 as u64; monkeys.len()];
 
     let lcm = monkeys.iter().map(|m| m.test).product::<u64>();
 
     let rounds = 0..10000;
 
     for _ in rounds {
-        for n in 0..N_MONKEYS {
+        for n in 0..monkeys.len() {
             let Monkey {
                 n: _,
                 items: Items(items),
