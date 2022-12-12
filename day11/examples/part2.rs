@@ -82,12 +82,12 @@ fn main() {
     for _ in 0..10000 {
         for n in 0..monkeys.len() {
             let Monkey {
-                n: _,
                 items: Items(items),
                 test,
                 op,
                 if_true,
                 if_false,
+                ..
             } = &mut monkeys[n];
 
             inspections[n] += items.len() as u64;
