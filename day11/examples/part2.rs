@@ -98,14 +98,7 @@ fn main() {
                 .drain(..)
                 .map(|item| {
                     let worry_level = eval(item, &op) % lcm;
-
-                    let to = if worry_level % *test == 0 {
-                        if_true.clone()
-                    } else {
-                        if_false.clone()
-                    };
-
-                    (to, worry_level)
+                    inspect(worry_level, test, if_true, if_false)
                 })
                 .collect::<Vec<_>>();
 
@@ -118,6 +111,16 @@ fn main() {
     inspections.sort_by(|a, b| b.cmp(a));
     let result: u64 = inspections[0] * inspections[1];
     println!("{:?}", result);
+}
+
+fn inspect(worry_level: u64, test: &u64, if_true: &usize, if_false: &usize) -> (usize, u64) {
+    let to = if worry_level % *test == 0 {
+        if_true.clone()
+    } else {
+        if_false.clone()
+    };
+
+    (to, worry_level)
 }
 
 fn eval(i: u64, op: &Operation) -> u64 {
