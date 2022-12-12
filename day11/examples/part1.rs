@@ -1,5 +1,5 @@
 use parse_display::{Display, FromStr};
-use std::io::{self, Read, Stdin};
+use std::io::{self, Read};
 use std::num::ParseIntError;
 
 #[derive(Display, FromStr, PartialEq, Debug, Clone)]
@@ -75,8 +75,10 @@ enum Symbol {
 }
 
 fn main() {
-    let stdin = io::stdin();
-    let mut monkeys = read_as_string(stdin)
+    let mut t = String::new();
+    _ = io::stdin().lock().read_to_string(&mut t);
+
+    let mut monkeys = t
         .split("\n\n")
         .map(|x| x.parse::<Monkey>().unwrap())
         .collect::<Vec<_>>();
@@ -136,12 +138,4 @@ fn value(i: u32, value: &Value) -> u32 {
         Value::Number(v) => *v,
         Value::Old => i,
     }
-}
-
-fn read_as_string(stdin: Stdin) -> String {
-    stdin
-        .lock()
-        .bytes()
-        .filter_map(|u| u.map(|x| x as char).ok())
-        .collect::<String>()
 }
