@@ -83,9 +83,7 @@ fn main() {
 
     let mut inspections = vec![0 as u32; monkeys.len()];
 
-    let rounds = 0..20;
-
-    for _ in rounds {
+    for _ in 0..20 {
         for i in 0..monkeys.len() {
             let Monkey {
                 n,

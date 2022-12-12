@@ -79,9 +79,7 @@ fn main() {
 
     let lcm = monkeys.iter().map(|m| m.test).product::<u64>();
 
-    let rounds = 0..10000;
-
-    for _ in rounds {
+    for _ in 0..10000 {
         for n in 0..monkeys.len() {
             let Monkey {
                 n: _,
