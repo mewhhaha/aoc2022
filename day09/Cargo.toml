@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "day9"
+name = "day09"
 version = "0.1.0"
 
 [[example]]
