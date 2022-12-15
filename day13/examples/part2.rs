@@ -33,10 +33,6 @@ fn main() {
 
     packets.sort_by(compare);
 
-    for packet in packets.iter() {
-        println!("{:?}", packet);
-    }
-
     let two = packets.iter().position(|x| x == &two);
     let six = packets.iter().position(|x| x == &six);
 
