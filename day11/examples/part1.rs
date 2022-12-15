@@ -38,14 +38,7 @@ impl std::str::FromStr for Items {
 
 impl std::fmt::Display for Items {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let items = self
-            .0
-            .iter()
-            .map(|x| x.to_string())
-            .collect::<Vec<_>>()
-            .join(", ");
-
-        write!(f, "{}", items)
+        write!(f, "") // This is wrong but I just need this for the trait
     }
 }
 
