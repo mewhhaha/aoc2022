@@ -6,11 +6,9 @@ use std::{cmp::Ordering, collections::VecDeque};
 use parse_display::{Display, FromStr};
 
 #[derive(Display, FromStr, PartialEq, Debug, Clone, Eq)]
-
 enum Symbol {
     #[display("[")]
     OpenList,
-
     #[display("]")]
     CloseList,
     #[display("{0}")]
@@ -47,21 +45,18 @@ fn compare(l: &VecDeque<Symbol>, r: &VecDeque<Symbol>) -> Ordering {
 
     while let (Some(next_left), Some(next_right)) = (left.pop_front(), right.pop_front()) {
         match (next_left, next_right) {
-            (x, y) if x == y => continue,
+            (x, y) if x == y => (),
             (Symbol::OpenList, Symbol::Number(n)) => {
                 right.push_front(Symbol::CloseList);
                 right.push_front(Symbol::Number(n));
-                continue;
             }
             (Symbol::Number(n), Symbol::OpenList) => {
                 left.push_front(Symbol::CloseList);
                 left.push_front(Symbol::Number(n));
-                continue;
             }
 
-            (Symbol::CloseList, _) => break,
             (Symbol::Number(a), Symbol::Number(b)) => return a.cmp(&b),
-
+            (Symbol::CloseList, _) => return Ordering::Less,
             _ => return Ordering::Greater,
         };
     }
