@@ -70,16 +70,8 @@ fn parse_rock(s: String) -> Vec<Point> {
     let mut current = points.next().unwrap();
 
     for point in points {
-        let range_x = if current.x < point.x {
-            current.x..=point.x
-        } else {
-            point.x..=current.x
-        };
-        let range_y = if current.y < point.y {
-            current.y..=point.y
-        } else {
-            point.y..=current.y
-        };
+        let range_x = current.x.min(point.x)..=current.x.max(point.x);
+        let range_y = current.y.min(point.y)..=current.y.max(point.y);
 
         result.extend(range_x.flat_map(|x| range_y.clone().map(move |y| Point { x, y })));
         current = point;
