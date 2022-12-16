@@ -61,10 +61,7 @@ fn main() {
         let c = rotate(&b);
         let d = rotate(&c);
 
-        potential_positions.extend(a.iter());
-        potential_positions.extend(b.iter());
-        potential_positions.extend(d.iter());
-        potential_positions.extend(c.iter());
+        potential_positions.extend(a.iter().chain(b.iter()).chain(c.iter()).chain(d.iter()));
     }
 
     let result = potential_positions
@@ -74,13 +71,9 @@ fn main() {
                 return false;
             }
 
-            for Sensor { sensor, beacon } in sensors.iter() {
-                let d = distance(&sensor, &beacon);
-                if distance(p, sensor) <= d {
-                    return false;
-                }
-            }
-            return true;
+            return sensors
+                .iter()
+                .all(|Sensor { sensor, beacon }| distance(&sensor, &beacon) < distance(p, sensor));
         })
         .next()
         .map(|Point { x, y }| (x * 4000000) + y);
