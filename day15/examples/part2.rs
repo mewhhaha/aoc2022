@@ -1,7 +1,6 @@
 #![feature(slice_group_by)]
 
 use parse_display::{Display, FromStr};
-use std::collections::HashSet;
 use std::io;
 use std::ops::{Add, Sub};
 
@@ -49,7 +48,7 @@ fn main() {
 
     let limit = 4000000;
 
-    let mut potential_positions = HashSet::<Point>::new();
+    let mut potential_positions = Vec::<Point>::new();
 
     for Sensor { sensor, beacon } in sensors.iter() {
         let d = distance(&sensor, &beacon) + 1; // The empty one has to be one distance from the edge
@@ -57,7 +56,7 @@ fn main() {
         let a = (sensor.x - d..sensor.x)
             .zip(sensor.y..sensor.y + d)
             .map(|(x, y)| Point { x, y })
-            .collect::<Vec<_>>();
+            .collect::<Vec<_>>(); // I used a HashSet here before but it was super slow
         let b = rotate(&a);
         let c = rotate(&b);
         let d = rotate(&c);
