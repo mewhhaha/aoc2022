@@ -105,7 +105,7 @@ fn main() {
         .map(|i| valves[*i].rate)
         .collect::<Vec<_>>();
 
-    let split_factor = tiny_graph.len() / 2 + 1;
+    let split_factor = tiny_graph.len() / 2;
     let result = max_flow(&tiny_graph, &rates, 1, &tiny_graph[0], split_factor);
 
     println!("{:?}", result);
@@ -132,10 +132,10 @@ fn max_flow(
 
         m = m.max(this_value + that_value);
 
-        if without_self.len() < split {
+        if without_self.len() == split {
             let start = keep_positions(graph[0].clone(), &without_self);
 
-            let split_value = max_flow(graph, rates, 1, &start, 0);
+            let split_value = max_flow(graph, rates, 1, &start, usize::MAX);
             m = m.max(this_value + split_value);
         }
     }
