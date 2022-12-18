@@ -47,6 +47,13 @@ type Graph = Vec<Vec<Edge>>;
 
 const TIME_LIMIT: i32 = 26;
 
+// I find the code I made quite hard to read,
+// but basically just reduce the graph to just the starting position and the valves that have rates.
+// This is done by calculating the shortest path between the relevant nodes, then just calculating
+// the max flow that can be achieved using this much smaller graph. The only difference for part2 is that
+// at each half-point we also check what the value would be if the other half was done by an elephant starting
+// at the original position.
+
 fn main() {
     let valves = io::stdin()
         .lines()
