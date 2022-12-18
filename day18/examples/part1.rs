@@ -36,9 +36,9 @@ fn main() {
         .map(|line| line.parse::<Point>().unwrap())
         .collect::<Vec<_>>();
 
-    let max_x = points.iter().max_by(|a, b| a.x.cmp(&b.x)).unwrap().x as usize;
-    let max_y = points.iter().max_by(|a, b| a.y.cmp(&b.y)).unwrap().y as usize;
-    let max_z = points.iter().max_by(|a, b| a.z.cmp(&b.z)).unwrap().z as usize;
+    let max_x = points.iter().map(|p| p.x).max().unwrap() as usize;
+    let max_y = points.iter().map(|p| p.y).max().unwrap() as usize;
+    let max_z = points.iter().map(|p| p.z).max().unwrap() as usize;
 
     let mut space: Space3D = vec![vec![vec![AIR; max_z + 1]; max_y + 1]; max_x + 1];
 
