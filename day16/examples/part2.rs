@@ -1,3 +1,5 @@
+#![feature(bool_to_option)]
+
 use parse_display::FromStr;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
@@ -70,14 +72,15 @@ fn main() {
         })
         .collect::<Vec<_>>();
 
-    let mut valves_with_rate = vec![*reverse_mapping.get(&"AA".to_string()).unwrap()];
-    valves_with_rate.extend(valves.iter().enumerate().filter_map(|(i, g)| {
-        if g.rate > 0 {
-            Some(i)
-        } else {
-            None
-        }
-    }));
+    let valves_with_rate = vec![*reverse_mapping.get(&"AA".to_string()).unwrap()]
+        .into_iter()
+        .chain(
+            valves
+                .iter()
+                .enumerate()
+                .filter_map(|(i, g)| (g.rate > 0).then_some(i)),
+        )
+        .collect::<Vec<_>>();
 
     let tiny_graph = valves_with_rate
         .iter()
