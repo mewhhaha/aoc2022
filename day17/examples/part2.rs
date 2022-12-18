@@ -64,7 +64,7 @@ fn main() {
     let mut t = String::new();
     let _ = io::stdin().lock().read_to_string(&mut t);
 
-    let mut instructions = t.chars().cycle();
+    let mut instructions = t.chars().enumerate().cycle();
     let mut shapes = SHAPES.iter().cycle();
 
     let mut map = HashSet::<Point>::new();
@@ -76,8 +76,6 @@ fn main() {
     let mut prev_rocks: i64 = 0;
     let mut diff_rocks: i64 = -1;
 
-    let mut number_of_instructions = 0;
-
     'outer: for rocks in 0..10000 {
         top_values.push(top);
         let mut shape = shapes
@@ -86,17 +84,14 @@ fn main() {
             .map(|p| p + Point { x: 3, y: top - 4 });
 
         loop {
-            let push_offset = jet_push(instructions.next().unwrap());
-            number_of_instructions += 1;
-            if number_of_instructions % t.len() == 0 {
+            let (number_of_instructions, instruction) = instructions.next().unwrap();
+
+            if number_of_instructions == 0 {
                 // Whenever the instructions are reset, there seems to be a consistent pattern
                 // when it comes to how much the shapes and top value will increase until the next round of instructions
                 let temp_diff_top = top - prev_top;
                 let temp_diff_rocks = rocks - prev_rocks;
                 if temp_diff_top == diff_top && temp_diff_rocks == diff_rocks {
-                    let mod_value = top_values[(CRAZY_NUMBER % diff_rocks) as usize];
-                    let multiple_value = (CRAZY_NUMBER / diff_rocks) * diff_top;
-                    top = mod_value + multiple_value;
                     break 'outer;
                 }
                 diff_top = temp_diff_top;
@@ -104,6 +99,8 @@ fn main() {
                 prev_top = top;
                 prev_rocks = rocks;
             }
+
+            let push_offset = jet_push(instruction);
             let pushed = shape.map(|p| p + push_offset);
             if !is_hit(&map, pushed.iter()) {
                 shape = pushed;
@@ -121,6 +118,10 @@ fn main() {
             }
         }
     }
+
+    let mod_value = top_values[(CRAZY_NUMBER % diff_rocks) as usize];
+    let multiple_value = (CRAZY_NUMBER / diff_rocks) * diff_top;
+    top = mod_value + multiple_value;
 
     println!("{:?}", top.abs())
 }
