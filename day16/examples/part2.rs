@@ -2,7 +2,7 @@
 
 use parse_display::FromStr;
 use std::cmp::Ordering;
-use std::collections::{BinaryHeap, HashMap};
+use std::collections::BinaryHeap;
 use std::io;
 
 #[derive(FromStr, PartialEq, Debug, Clone, Eq, Hash)]
@@ -53,12 +53,6 @@ fn main() {
         .filter_map(|line| line.unwrap().parse::<Valve>().ok())
         .collect::<Vec<_>>();
 
-    let reverse_mapping = valves
-        .iter()
-        .enumerate()
-        .map(|(i, x)| (&x.name, i))
-        .collect::<HashMap<_, _>>();
-
     let graph = valves
         .iter()
         .map(|Valve { tunnels, .. }| {
@@ -66,13 +60,13 @@ fn main() {
                 .split(", ")
                 .map(|tunnel| Edge {
                     cost: 1,
-                    position: *reverse_mapping.get(&tunnel.to_string()).unwrap(),
+                    position: valves.iter().position(|v| v.name == tunnel).unwrap(),
                 })
                 .collect::<Vec<_>>()
         })
         .collect::<Vec<_>>();
 
-    let valves_with_rate = vec![*reverse_mapping.get(&"AA".to_string()).unwrap()]
+    let valves_with_rate = vec![valves.iter().position(|v| v.name == "AA").unwrap()]
         .into_iter()
         .chain(
             valves
