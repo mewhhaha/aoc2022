@@ -1,5 +1,3 @@
-#![feature(slice_group_by)]
-
 use parse_display::FromStr;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
