@@ -15,10 +15,6 @@ fn main() {
 
     for _ in 0..10 {
         for (i, number) in numbers.iter() {
-            if length == 7 {
-                println!("{:?}", file.iter().map(|x| x.1).collect::<Vec<_>>());
-            }
-
             let from = file.iter().position(|n| n.0 == *i).unwrap();
 
             file.remove(from);
@@ -29,10 +25,6 @@ fn main() {
             }
 
             file.insert(from, (*i, *number));
-
-            if length == 7 {
-                println!("{:?}", file.iter().map(|x| x.1).collect::<Vec<_>>());
-            }
         }
     }
 
