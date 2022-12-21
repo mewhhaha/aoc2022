@@ -41,7 +41,7 @@ fn main() {
         .map(|m| (m.name.clone(), m))
         .collect::<HashMap<_, _>>();
 
-    let (mut memo, human_related) = run_monkeys(
+    let (mut memo, human_related) = eval_monkeys(
         &HashMap::<String, i64>::new(),
         vec!["root".to_string()],
         &monkeys,
@@ -51,11 +51,14 @@ fn main() {
 
     let monkey = monkeys.get("root").unwrap();
 
-    let (lhs, _, rhs) = try_equation(&monkey.yell).unwrap();
+    let (lhs, rhs) = match &monkey.yell {
+        Yell::Number(_) => panic!(),
+        Yell::Equation(lhs, _, rhs) => (lhs, rhs),
+    };
 
-    let start_value = memo.get(&lhs).or_else(|| memo.get(&rhs)).unwrap();
+    let start_value = 2 * memo.get(lhs).or_else(|| memo.get(rhs)).unwrap();
 
-    let humn_value = solve_humn(&memo, *start_value * 2, &"root".to_string(), &monkeys);
+    let humn_value = solve_humn(&memo, start_value, &"root".to_string(), &monkeys);
 
     println!("{:}", humn_value);
 }
@@ -104,7 +107,7 @@ fn solve_rhs(eq: i64, op: &Op, value: i64) -> i64 {
     }
 }
 
-fn run_monkeys(
+fn eval_monkeys(
     start_memo: &HashMap<String, i64>,
     mut remaining: Vec<String>,
     monkeys: &HashMap<String, Monkey>,
@@ -147,15 +150,6 @@ fn run_monkeys(
     }
 
     (memo, related)
-}
-
-fn try_equation(yell: &Yell) -> Option<(String, Op, String)> {
-    match yell {
-        Yell::Number(_) => None,
-        Yell::Equation(left_name, op, right_name) => {
-            Some((left_name.clone(), op.clone(), right_name.clone()))
-        }
-    }
 }
 
 fn eval(lhs: i64, op: &Op, rhs: i64) -> i64 {
