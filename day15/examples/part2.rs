@@ -1,5 +1,3 @@
-#![feature(slice_group_by)]
-
 use parse_display::{Display, FromStr};
 use std::io;
 use std::ops::{Add, Sub};

@@ -1,5 +1,3 @@
-#![feature(slice_group_by)]
-
 use parse_display::{Display, FromStr};
 use std::collections::HashSet;
 use std::io;
