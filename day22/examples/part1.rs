@@ -81,7 +81,7 @@ fn main() {
 
     let (_, x) = meta_row(&map, 0);
 
-    let mut point = Point { x, y: 0 };
+    let mut position = Point { x, y: 0 };
 
     for instruction in instructions {
         match instruction {
@@ -95,41 +95,41 @@ fn main() {
                 let m = &facing[0];
                 match m {
                     Face::Left | Face::Right => {
-                        let (width, x_offset) = meta_row(&map, point.y);
+                        let (width, x_offset) = meta_row(&map, position.y);
 
                         let move_x = if m == &Face::Left { -1 } else { 1 };
 
                         for _ in 0..v {
-                            let next_x =
-                                (point.x + move_x - x_offset).rem_euclid(width as i32) + x_offset;
+                            let next_x = (position.x + move_x - x_offset).rem_euclid(width as i32)
+                                + x_offset;
                             let next = Point {
                                 x: next_x,
-                                y: point.y,
+                                y: position.y,
                             };
                             match map.get(&next).unwrap() {
                                 Tile::Tree => break,
                                 Tile::Space => {
-                                    point = next;
+                                    position = next;
                                 }
                             }
                         }
                     }
                     Face::Up | Face::Down => {
-                        let (height, y_offset) = meta_col(&map, point.x);
+                        let (height, y_offset) = meta_col(&map, position.x);
 
                         let move_y = if m == &Face::Up { -1 } else { 1 };
 
                         for _ in 0..v {
-                            let next_y =
-                                (point.y + move_y - y_offset).rem_euclid(height as i32) + y_offset;
+                            let next_y = (position.y + move_y - y_offset).rem_euclid(height as i32)
+                                + y_offset;
                             let next = Point {
-                                x: point.x,
+                                x: position.x,
                                 y: next_y,
                             };
                             match map.get(&next).unwrap() {
                                 Tile::Tree => break,
                                 Tile::Space => {
-                                    point = next;
+                                    position = next;
                                 }
                             }
                         }
@@ -139,7 +139,7 @@ fn main() {
         }
     }
 
-    let result = 1000 * (point.y + 1) + 4 * (point.x + 1) + facing[0].clone() as i32;
+    let result = 1000 * (position.y + 1) + 4 * (position.x + 1) + facing[0].clone() as i32;
 
     println!("{:?}", result);
 }
