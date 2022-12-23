@@ -150,7 +150,7 @@ fn main() {
                             let t = tile_in(&position);
                             let relative = position - t;
 
-                            match (t, face) {
+                            let (edge, f) = match (t, face) {
                                 // ONE LEFT - FOUR LEFT
                                 (TILE_ONE, Face::Left) | (TILE_FOUR, Face::Left) => {
                                     let other_tile =
@@ -160,16 +160,7 @@ fn main() {
                                         y: top_edge(other_tile) + upside_down(relative.y),
                                     };
 
-                                    println!("{:?} to {:?}", position, edge);
-
-                                    match map.get(&edge) {
-                                        Some(Tile::Tree) => break,
-                                        Some(Tile::Space) => {
-                                            position = edge;
-                                            face = opposite(Face::Left);
-                                        }
-                                        _ => panic!(),
-                                    }
+                                    (edge, opposite(Face::Left))
                                 }
 
                                 // TWO RIGHT - FIVE RIGHT
@@ -180,15 +171,7 @@ fn main() {
                                         x: right_edge(other_tile),
                                         y: top_edge(other_tile) + upside_down(relative.y),
                                     };
-
-                                    match map.get(&edge) {
-                                        Some(Tile::Tree) => break,
-                                        Some(Tile::Space) => {
-                                            position = edge;
-                                            face = opposite(Face::Right);
-                                        }
-                                        _ => panic!(),
-                                    }
+                                    (edge, opposite(Face::Right))
                                 }
 
                                 // ONE UP - SIX LEFT
@@ -197,30 +180,14 @@ fn main() {
                                         x: left_edge(TILE_SIX),
                                         y: top_edge(TILE_SIX) + relative.x,
                                     };
-
-                                    match map.get(&edge) {
-                                        Some(Tile::Tree) => break,
-                                        Some(Tile::Space) => {
-                                            position = edge;
-                                            face = opposite(Face::Left)
-                                        }
-                                        _ => panic!(),
-                                    }
+                                    (edge, opposite(Face::Left))
                                 }
                                 (TILE_SIX, Face::Left) => {
                                     let edge = Point {
                                         x: left_edge(TILE_ONE) + relative.y,
                                         y: top_edge(TILE_ONE),
                                     };
-
-                                    match map.get(&edge) {
-                                        Some(Tile::Tree) => break,
-                                        Some(Tile::Space) => {
-                                            position = edge;
-                                            face = opposite(Face::Up)
-                                        }
-                                        _ => panic!(),
-                                    }
+                                    (edge, opposite(Face::Up))
                                 }
 
                                 // TWO DOWN - THREE RIGHT
@@ -229,30 +196,14 @@ fn main() {
                                         x: right_edge(TILE_THREE),
                                         y: top_edge(TILE_THREE) + relative.x,
                                     };
-
-                                    match map.get(&edge) {
-                                        Some(Tile::Tree) => break,
-                                        Some(Tile::Space) => {
-                                            position = edge;
-                                            face = opposite(Face::Right);
-                                        }
-                                        _ => panic!(),
-                                    }
+                                    (edge, opposite(Face::Right))
                                 }
                                 (TILE_THREE, Face::Right) => {
                                     let edge = Point {
                                         x: left_edge(TILE_TWO) + relative.y,
                                         y: bottom_edge(TILE_TWO),
                                     };
-
-                                    match map.get(&edge) {
-                                        Some(Tile::Tree) => break,
-                                        Some(Tile::Space) => {
-                                            position = edge;
-                                            face = opposite(Face::Down);
-                                        }
-                                        _ => panic!(),
-                                    }
+                                    (edge, opposite(Face::Down))
                                 }
 
                                 // TWO UP - SIX DOWN
@@ -262,27 +213,14 @@ fn main() {
                                         y: bottom_edge(TILE_SIX),
                                     };
 
-                                    match map.get(&edge) {
-                                        Some(Tile::Tree) => break,
-                                        Some(Tile::Space) => {
-                                            position = edge;
-                                        }
-                                        _ => panic!(),
-                                    }
+                                    (edge, Face::Up)
                                 }
                                 (TILE_SIX, Face::Down) => {
                                     let edge = Point {
                                         x: left_edge(TILE_TWO) + relative.x,
                                         y: top_edge(TILE_TWO),
                                     };
-
-                                    match map.get(&edge) {
-                                        Some(Tile::Tree) => break,
-                                        Some(Tile::Space) => {
-                                            position = edge;
-                                        }
-                                        _ => panic!(),
-                                    }
+                                    (edge, Face::Down)
                                 }
 
                                 // THREE LEFT - FOUR UP
@@ -291,30 +229,14 @@ fn main() {
                                         x: left_edge(TILE_FOUR) + relative.y,
                                         y: top_edge(TILE_FOUR),
                                     };
-
-                                    match map.get(&edge) {
-                                        Some(Tile::Tree) => break,
-                                        Some(Tile::Space) => {
-                                            position = edge;
-                                            face = opposite(Face::Up);
-                                        }
-                                        _ => panic!(),
-                                    }
+                                    (edge, opposite(Face::Up))
                                 }
                                 (TILE_FOUR, Face::Up) => {
                                     let edge = Point {
                                         x: left_edge(TILE_THREE),
                                         y: top_edge(TILE_THREE) + relative.x,
                                     };
-
-                                    match map.get(&edge) {
-                                        Some(Tile::Tree) => break,
-                                        Some(Tile::Space) => {
-                                            position = edge;
-                                            face = opposite(Face::Left);
-                                        }
-                                        _ => panic!(),
-                                    }
+                                    (edge, opposite(Face::Left))
                                 }
 
                                 // FIVE DOWN - SIX RIGHT
@@ -323,32 +245,25 @@ fn main() {
                                         x: right_edge(TILE_SIX),
                                         y: top_edge(TILE_SIX) + relative.x,
                                     };
-
-                                    match map.get(&edge) {
-                                        Some(Tile::Tree) => break,
-                                        Some(Tile::Space) => {
-                                            position = edge;
-                                            face = opposite(Face::Right);
-                                        }
-                                        _ => panic!(),
-                                    }
+                                    (edge, opposite(Face::Right))
                                 }
                                 (TILE_SIX, Face::Right) => {
                                     let edge = Point {
                                         x: left_edge(TILE_FIVE) + relative.y,
                                         y: bottom_edge(TILE_FIVE),
                                     };
-
-                                    match map.get(&edge) {
-                                        Some(Tile::Tree) => break,
-                                        Some(Tile::Space) => {
-                                            position = edge;
-                                            face = opposite(Face::Down);
-                                        }
-                                        _ => panic!(),
-                                    }
+                                    (edge, opposite(Face::Down))
                                 }
 
+                                _ => panic!(),
+                            };
+
+                            match map.get(&edge) {
+                                Some(Tile::Tree) => break,
+                                Some(Tile::Space) => {
+                                    position = edge;
+                                    face = f;
+                                }
                                 _ => panic!(),
                             }
                         }
