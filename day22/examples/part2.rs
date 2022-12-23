@@ -175,36 +175,20 @@ fn main() {
                                 }
 
                                 // ONE UP - SIX LEFT
-                                (TILE_ONE, Face::Up) => {
-                                    let edge = Point {
-                                        x: left_edge(TILE_SIX),
-                                        y: top_edge(TILE_SIX) + relative.x,
-                                    };
-                                    (edge, opposite(Face::Left))
-                                }
-                                (TILE_SIX, Face::Left) => {
-                                    let edge = Point {
-                                        x: left_edge(TILE_ONE) + relative.y,
-                                        y: top_edge(TILE_ONE),
-                                    };
-                                    (edge, opposite(Face::Up))
-                                }
+                                (TILE_ONE, Face::Up) => up_left(TILE_SIX, relative),
+                                (TILE_SIX, Face::Left) => left_up(TILE_ONE, relative),
+
+                                // FOUR UP - THREE LEFT
+                                (TILE_FOUR, Face::Up) => up_left(TILE_THREE, relative),
+                                (TILE_THREE, Face::Left) => left_up(TILE_FOUR, relative),
 
                                 // TWO DOWN - THREE RIGHT
-                                (TILE_TWO, Face::Down) => {
-                                    let edge = Point {
-                                        x: right_edge(TILE_THREE),
-                                        y: top_edge(TILE_THREE) + relative.x,
-                                    };
-                                    (edge, opposite(Face::Right))
-                                }
-                                (TILE_THREE, Face::Right) => {
-                                    let edge = Point {
-                                        x: left_edge(TILE_TWO) + relative.y,
-                                        y: bottom_edge(TILE_TWO),
-                                    };
-                                    (edge, opposite(Face::Down))
-                                }
+                                (TILE_TWO, Face::Down) => down_right(TILE_THREE, relative),
+                                (TILE_THREE, Face::Right) => right_down(TILE_TWO, relative),
+
+                                // FIVE DOWN - SIX RIGHT
+                                (TILE_FIVE, Face::Down) => down_right(TILE_SIX, relative),
+                                (TILE_SIX, Face::Right) => right_down(TILE_FIVE, relative),
 
                                 // TWO UP - SIX DOWN
                                 (TILE_TWO, Face::Up) => {
@@ -221,38 +205,6 @@ fn main() {
                                         y: top_edge(TILE_TWO),
                                     };
                                     (edge, Face::Down)
-                                }
-
-                                // THREE LEFT - FOUR UP
-                                (TILE_THREE, Face::Left) => {
-                                    let edge = Point {
-                                        x: left_edge(TILE_FOUR) + relative.y,
-                                        y: top_edge(TILE_FOUR),
-                                    };
-                                    (edge, opposite(Face::Up))
-                                }
-                                (TILE_FOUR, Face::Up) => {
-                                    let edge = Point {
-                                        x: left_edge(TILE_THREE),
-                                        y: top_edge(TILE_THREE) + relative.x,
-                                    };
-                                    (edge, opposite(Face::Left))
-                                }
-
-                                // FIVE DOWN - SIX RIGHT
-                                (TILE_FIVE, Face::Down) => {
-                                    let edge = Point {
-                                        x: right_edge(TILE_SIX),
-                                        y: top_edge(TILE_SIX) + relative.x,
-                                    };
-                                    (edge, opposite(Face::Right))
-                                }
-                                (TILE_SIX, Face::Right) => {
-                                    let edge = Point {
-                                        x: left_edge(TILE_FIVE) + relative.y,
-                                        y: bottom_edge(TILE_FIVE),
-                                    };
-                                    (edge, opposite(Face::Down))
                                 }
 
                                 _ => panic!(),
@@ -326,6 +278,38 @@ fn clockwise(face: Face) -> Face {
         Face::Down => Face::Left,
         Face::Left => Face::Up,
     }
+}
+
+fn up_left(tile: Point, relative: Point) -> (Point, Face) {
+    let edge = Point {
+        x: left_edge(tile),
+        y: top_edge(tile) + relative.x,
+    };
+    (edge, opposite(Face::Left))
+}
+
+fn left_up(tile: Point, relative: Point) -> (Point, Face) {
+    let edge = Point {
+        x: left_edge(tile) + relative.y,
+        y: top_edge(tile),
+    };
+    (edge, opposite(Face::Up))
+}
+
+fn down_right(tile: Point, relative: Point) -> (Point, Face) {
+    let edge = Point {
+        x: right_edge(tile),
+        y: top_edge(tile) + relative.x,
+    };
+    (edge, opposite(Face::Right))
+}
+
+fn right_down(tile: Point, relative: Point) -> (Point, Face) {
+    let edge = Point {
+        x: left_edge(tile) + relative.y,
+        y: bottom_edge(tile),
+    };
+    (edge, opposite(Face::Down))
 }
 
 fn counter_clockwise(face: Face) -> Face {
