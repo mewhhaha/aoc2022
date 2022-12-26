@@ -91,23 +91,7 @@ fn main() {
             .collect();
     }
 
-    let start = (0, Point { x: 0, y: -1 });
-    let end = (
-        0,
-        Point {
-            x: number_of_columns - 1,
-            y: number_of_rows,
-        },
-    );
-    let result = djikstra(start, end, |(elapsed, (_, position))| {
-        let next_to_end = Point {
-            x: number_of_columns - 1,
-            y: number_of_rows - 1,
-        };
-        if position == next_to_end {
-            return vec![(1, end)];
-        }
-
+    let edges = |(elapsed, position)| {
         let get_range = |t: usize, p: Point| {
             time_map
                 .get(p.y as usize)
@@ -145,7 +129,27 @@ fn main() {
             .collect::<Vec<_>>();
 
         edges
-    });
+    };
+
+    let start = Point { x: 0, y: -1 };
+    let end = Point {
+        x: number_of_columns - 1,
+        y: number_of_rows,
+    };
+    let next_to_start = Point { x: 0, y: 0 };
+    let next_to_end = Point {
+        x: number_of_columns - 1,
+        y: number_of_rows - 1,
+    };
+
+    let first = 1 + djikstra((0, start), |(_, p)| *p == next_to_end, edges).unwrap();
+
+    let second = 1 + djikstra((first, end), |(_, p)| *p == next_to_start, edges).unwrap();
+
+    let third = 1 + djikstra((first + second, start), |(_, p)| *p == next_to_end, edges).unwrap();
+
+    let result = first + second + third;
+
     println!("{:?}", result);
 }
 
@@ -197,7 +201,11 @@ impl<T: Ord> PartialOrd for State<T> {
     }
 }
 
-fn djikstra<T>(start: T, end: T, graph: impl Fn((i32, T)) -> Vec<(i32, T)>) -> Option<i32>
+fn djikstra<T>(
+    start: T,
+    is_end: impl Fn(&T) -> bool,
+    graph: impl Fn(T) -> Vec<(i32, T)>,
+) -> Option<i32>
 where
     T: std::hash::Hash,
     T: Ord,
@@ -213,7 +221,7 @@ where
     });
 
     while let Some(State { cost, position }) = remaining.pop() {
-        if position == end {
+        if is_end(&position) {
             return Some(cost);
         }
 
@@ -221,7 +229,7 @@ where
             continue;
         }
 
-        for (edge_cost, edge_position) in graph((cost, position)) {
+        for (edge_cost, edge_position) in graph(position) {
             let next = State {
                 cost: cost + edge_cost,
                 position: edge_position,
