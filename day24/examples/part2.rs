@@ -115,8 +115,8 @@ fn main() {
                 .map(|r| r.iter().cycle().skip(t).take(max_time as usize))
         };
 
-        let max_wait = get_range(elapsed as usize + 1, position)
-            .and_then(|mut r| r.position(|p| *p).map(|i| i as i32 + 1))
+        let max_wait = get_range(elapsed as usize, position)
+            .and_then(|mut r| r.position(|p| *p).map(|i| i as i32))
             .unwrap_or(max_time);
 
         let edges = ADJACENT
@@ -203,9 +203,7 @@ where
     T: Ord,
     T: Eq,
     T: Clone,
-    T: std::fmt::Debug,
 {
-    let mut path = HashMap::<T, T>::new();
     let mut visited = HashMap::<T, i32>::new();
     let mut remaining = BinaryHeap::<State<T>>::new();
 
@@ -216,10 +214,6 @@ where
 
     while let Some(State { cost, position }) = remaining.pop() {
         if position == end {
-            let mut curr = end;
-            while let Some(x) = path.get(&curr) {
-                curr = x.clone();
-            }
             return Some(cost);
         }
 
@@ -227,7 +221,6 @@ where
             continue;
         }
 
-        let p = position.clone();
         for (edge_cost, edge_position) in graph((cost, position)) {
             let next = State {
                 cost: cost + edge_cost,
@@ -235,7 +228,6 @@ where
             };
 
             if &next.cost < visited.get(&next.position).unwrap_or(&i32::MAX) {
-                path.insert(next.position.clone(), p.clone());
                 visited.insert(next.position.clone(), next.cost.clone());
                 remaining.push(next);
             }
